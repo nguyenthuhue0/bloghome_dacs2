@@ -11,6 +11,10 @@ $article = new Article($db);
 $userInfo = new UserInfo($db);
 
 $articles = $article->loadAllArticleAd();
+
+if (isset($_GET['article'])) {
+    $articles = $article->getArticleByTitle($_GET['article']);
+}
 ?>
 
 <!DOCTYPE html>
@@ -54,11 +58,9 @@ $articles = $article->loadAllArticleAd();
             </div>
         </div>
     </header>
-
-
     <!-- Page content-->
     <div class="container">
-        <form action="" method="POST">
+        <form action="" method="GET">
             <!-- Search widget-->
             <div class="card mb-4">
 
@@ -74,80 +76,41 @@ $articles = $article->loadAllArticleAd();
         <!-- Blog entries-->
         <!-- Blog post-->
         <div class="row">
-
-            <?php
-            $connect = mysqli_connect("localhost", "root", "", "pte");
-            if (isset($_POST['searching'])) {
-                $key = $_POST['article'];
-                $query = "SELECT * FROM article WHERE title LIKE '%" . $key . "%' OR content LIKE '%" . $key . "%'";
-                $query_run = mysqli_query($connect, $query);
-
-                if (mysqli_num_rows($query_run) > 0) {
-                    while ($row = mysqli_fetch_assoc($query_run)) { ?>
-
-                        <div class="container">
-                            <div class="col-lg-12 p-2">
-                                <div class="row">
-                                    <div class="card mb-4">
-                                        <img class="card-img-top" src="<?php echo $row['img']; ?>">
-                                        <div class=" small text-muted ">January 1, 2023
-                                        </div>
-                                        <h5 class=" card-title mb-3">
-                                            <?php echo $row['title'] ?></h5>
-                                        <p class="card-text"><?php echo $row['content'] ?></p>
-                                        <!-- <a class="text-decoration-none link-dark stretched-link" href="./article-view.php?id=<?php echo $row['id']; ?>"> </a>
-
-        </div>
-    </div>
-    </div>
-    </div> -->
-                            <?php
-                        }
-                    } else {
-                        echo "No record found";
-                    }
-                }
-
-                            ?>
-                            <div class="card col-3 p-2 m-2">
-                                <a href="#"><img class="card-img-top" src="<?php echo isset($articles) ? $articles[0]['img'] : "" ?>" alt="..." /> </a>
-                                <div class="small text-muted">January 1, 2023</div>
-                                <h5 class="card-title mb-3">
-                                    <?php echo isset($articles) ? $articles[0]['title'] : "" ?></h5>
-                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reiciendis aliquid atque, nulla.</p>
-                                <a class="text-decoration-none link-dark stretched-link" href="./article-view.php?id=<?php echo $articles[0]['articleId'] ?>"> </a>
-                            </div>
-                            <!-- Blog post-->
-                            <div class="card col-3 p-2 m-2">
-                                <a href="#"><img class="card-img-top" src="<?php echo isset($articles) ? $articles[0]['img'] : "" ?>" alt="..." /> </a>
-                                <a class="text-decoration-none link-dark stretched-link" href="./article-view.php?id=<?php echo $articles[0]['articleId'] ?>"> </a>
-                                <div class="small text-muted">January 1, 2023</div>
-                                <h5 class="card-title mb-3">
-                                    <?php echo isset($articles) ? $articles[1]['title'] : "" ?></h5>
-                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reiciendis aliquid atque, nulla.</p>
-
-                            </div>
+            <div class="container">
+                <div class="col-lg-12 p-2">
+                    <div class="row">
+                        <?php foreach ($articles as $row) : ?>
+                            <div class="col-12 col-md-6 col-lg-3">
+                                <div class="card mb-4">
+                                    <a href="http://localhost:3000/fixdacs2/View/user/article-view.php?id=<?php echo $row['articleId'] ?>"><img class="card-img-top" src="<?php echo $row['img']; ?>" alt="..."></a>
+                                    <div class="card-body">
+                                        <div class="small text-muted"><?php echo $row['datePosted']; ?></div>
+                                        <h2 class="card-title h4"><?php echo $row['title']; ?></h2>
+                                        <p class="card-text"><?php echo $row['content']; ?></p>
+                                        <a class="btn btn-primary" href="/article-view.php">Read more →</a>
                                     </div>
-
                                 </div>
-
-                                <!-- Pagination-->
-                                <nav aria-label="Pagination">
-                                    <hr class="my-0" />
-                                    <ul class="pagination justify-content-center my-4">
-                                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
-                                        <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
-                                        <li class="page-item"><a class="page-link" href="#!">2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#!">3</a></li>
-                                        <li class="page-item disabled"><a class="page-link" href="#!">...</a></li>
-                                        <li class="page-item"><a class="page-link" href="#!">15</a></li>
-                                        <li class="page-item"><a class="page-link" href="#!">Older</a></li>
-                                    </ul>
-                                </nav>
                             </div>
-                            <!-- Side widgets-->
+                        <?php endforeach; ?>
+                    </div>
+                    <!-- Pagination-->
+                    <nav aria-label="Pagination">
+                        <hr class="my-0" />
+                        <ul class="pagination justify-content-center my-4">
+                            <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a>
+                            </li>
+                            <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#!">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#!">3</a></li>
+                            <li class="page-item disabled"><a class="page-link" href="#!">...</a></li>
+                            <li class="page-item"><a class="page-link" href="#!">15</a></li>
+                            <li class="page-item"><a class="page-link" href="#!">Older</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <!-- Side widgets-->
 
-                        </div>
+            </div>
         </div>
         <!-- Footer-->
         <footer class="py-5 bg-dark">
@@ -159,9 +122,6 @@ $articles = $article->loadAllArticleAd();
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <script src="js/scripts.js"></script>
-
-
-
 
 
 </body>
